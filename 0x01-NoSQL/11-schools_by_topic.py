@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 """ Contains function that returns list of school having specific topic."""
 
 
