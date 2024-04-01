@@ -10,6 +10,19 @@ import uuid
 from functools import wraps
 
 
+def count_calls(method: Callable) -> Callable:
+    """Returns a Callable"""
+    key = method.__qualname__
+
+    @wraps(method)
+    def wrapper(self, *args, **kwargs):
+        """Creates and returns function that increment the cound for a key
+        On every call."""
+        self._redis.incr(key)
+        return (method(self, *args, **kwargs))
+    return (wrapper)
+
+
 class Cache:
     """ Cache class with two methods (__init__ and store)"""
 
@@ -17,18 +30,6 @@ class Cache:
         """Stores and flush an instance of redis."""
         self._redis = redis.Redis()
         self._redis.flushdb()
-
-    def count_calls(method: Callable) -> Callable:
-        """Returns a Callable"""
-        key = method.__qualname__
-
-        @wraps(method)
-        def wrapper(self, *args, **kwargs):
-            """Creates and returns function that increment the cound for a key
-            On every call."""
-            self._redis.incr(key)
-            return (method(self, *args, **kwargs))
-        return (wrapper)
 
     @count_calls
     def store(self, data: Union[str, bytes, int, float]) -> str:
