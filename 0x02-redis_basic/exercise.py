@@ -7,6 +7,7 @@ a store method that takes a data argument and returns a string
 import redis
 from typing import Union, Callable
 import uuid
+from functools import wraps
 
 
 class Cache:
@@ -17,6 +18,19 @@ class Cache:
         self._redis = redis.Redis()
         self._redis.flushdb()
 
+    @staticmethod
+    def count_calls(method: Callable) -> Callable:
+        """Returns a Callable"""
+        @wraps(method)
+        def wrapper(self, *args, **kwargs):
+            """Creates and returns function that increment the cound for a key
+            On every call."""
+            key = method.__qualname__
+            self._redis.incr(key)
+            return (method(self, *args, **kwargs))
+        return (wrapper)
+
+    @count_calls
     def store(self, data: Union[str, bytes, int, float]) -> str:
         """Takes a data argument and returns a string."""
         key = str(uuid.uuid4())
