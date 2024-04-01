@@ -22,6 +22,22 @@ def count_calls(method: Callable) -> Callable:
         return (method(self, *args, **kwargs))
     return (wrapper)
 
+def call_history(method: Callable) -> Callable:
+    """ create input and output list keys, respectively."""
+    key = method.__qualname__
+    i = "".join([key, ":inputs"])
+    o = "".join([key, ":outputs"])
+
+    @wraps(method)
+    def wrapper(self, *args, **kwargs):
+        """Wrapper"""
+        self._redis.rpush(i, str(args))
+        res = method(self, *args, **kwargs)
+        self._redis.rpush(o, str(res))
+        return (res)
+    return (wrapper)
+
+
 
 class Cache:
     """ Cache class with two methods (__init__ and store)"""
