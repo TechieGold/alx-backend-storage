@@ -22,6 +22,7 @@ def count_calls(method: Callable) -> Callable:
         return (method(self, *args, **kwargs))
     return (wrapper)
 
+
 def call_history(method: Callable) -> Callable:
     """ create input and output list keys, respectively."""
     key = method.__qualname__
@@ -36,6 +37,7 @@ def call_history(method: Callable) -> Callable:
         self._redis.rpush(o, str(res))
         return (res)
     return (wrapper)
+
 
 def replay(fn: Callable):
     '''display the history of calls of a particular function.'''
@@ -59,7 +61,6 @@ def replay(fn: Callable):
         except Exception:
             outp = ""
         print("{}(*{}) -> {}".format(func_name, inp, outp))
-
 
 
 class Cache:
