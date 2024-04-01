@@ -21,11 +21,12 @@ class Cache:
     @staticmethod
     def count_calls(method: Callable) -> Callable:
         """Returns a Callable"""
+        key = method.__qualname__
+
         @wraps(method)
         def wrapper(self, *args, **kwargs):
             """Creates and returns function that increment the cound for a key
             On every call."""
-            key = method.__qualname__
             self._redis.incr(key)
             return (method(self, *args, **kwargs))
         return (wrapper)
